@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-import threading
 import serial
+import sys
+import threading
 import usb.core
 
-def read_serial_output():
+def read_serial_output(serial_port: str = None):
+    """Read iPhone serial output."""
+    if serial_port is None:
+        serial_port = '/dev/ttyUSB0'
+
     ser = serial.Serial(
-        port='/dev/ttyUSB0',\
+        port=serial_port,\
         baudrate=115200,\
         parity=serial.PARITY_NONE,\
         stopbits=serial.STOPBITS_ONE,\
@@ -77,10 +82,15 @@ def pongo_prompt():
 
 
 def main():
-    t = threading.Thread(target=read_serial_output)
+    if len(sys.argv) == 2:
+        port = sys.argv[1]
+    else:
+        port = None
+    t = threading.Thread(target=read_serial_output, args=(port,))
     t.start()
     pongo_prompt()
 
 
 if __name__ == '__main__':
     main()
+
